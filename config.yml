@@ -1,0 +1,5 @@
+default_port: 1337
+max_connections: 5
+protocol:
+  version: 1
+  ttl: 5

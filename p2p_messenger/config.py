@@ -1,0 +1,28 @@
+import yaml
+
+class Config:
+	"""
+	Static class holding configuration values loaded from `config.yml`.
+	"""
+
+	default_port = 3333
+	"""Default port for the node to listen."""
+
+	max_connections = 5
+	"""Maximum number of concurrent connections for a single node."""
+
+	prot_version = 1
+	"""Version of the protocol this client uses to send messages."""
+
+	prot_default_ttl = 5
+	"""TTL value used when creating messages."""
+
+	@classmethod
+	def load(cls):
+		"""Load configuration values from `config.yml` and update values in class."""
+		with open('./config.yml', 'r') as f:
+			config = yaml.safe_load(f)
+			cls.default_port = config['default_port']
+			cls.max_connections = config['max_connections']
+			cls.prot_version = config['protocol']['version']
+			cls.prot_default_ttl = config['protocol']['ttl']
