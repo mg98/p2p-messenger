@@ -37,6 +37,9 @@
                                 <a class="function" href="#Header.__init__">Header</a>
                         </li>
                         <li>
+                                <a class="variable" href="#Header.sequence_id">sequence_id</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Header.gen_message_id">gen_message_id</a>
                         </li>
                         <li>
@@ -134,15 +137,31 @@
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Header</span><span class="p">:</span>
 	<span class="sd">&quot;&quot;&quot;Structure of the protocol header included in the first 16 bytes of every message.&quot;&quot;&quot;</span>
 
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_version</span>
+	<span class="n">sequence_id</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	This value is part of the message id hash input and gets incremented continuously.</span>
+<span class="sd">	This is crucial for when multiple messages of the same type get created at the same time.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+		<span class="bp">self</span><span class="p">,</span>
+		<span class="n">version</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_version</span><span class="p">,</span>
+		<span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+		<span class="n">ttl</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_default_ttl</span><span class="p">,</span>
+		<span class="n">hop_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+		<span class="n">port</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span>
+		<span class="n">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+		<span class="n">ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()),</span>
+		<span class="n">message_id</span> <span class="o">=</span> <span class="bp">None</span>
+	<span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">msg_type</span> <span class="o">=</span> <span class="n">msg_type</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_default_ttl</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="mi">0</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="mi">1337</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_message_id</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="n">hop_count</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="n">message_id</span>
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 		<span class="k">return</span> <span class="s1">&#39;|{}|{}|{}|{}|{}|{}|{}|{}|&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -157,13 +176,14 @@
 		<span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">gen_message_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-		<span class="sd">&quot;&quot;&quot;Creates new message id for this header using current timestamp.&quot;&quot;&quot;</span>
-		<span class="n">hash_input</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+		<span class="sd">&quot;&quot;&quot;Creates a new unique message id for this header.&quot;&quot;&quot;</span>
+		<span class="n">hash_input</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">Header</span><span class="o">.</span><span class="n">sequence_id</span><span class="p">)</span>
+		<span class="n">Header</span><span class="o">.</span><span class="n">sequence_id</span> <span class="o">+=</span> <span class="mi">1</span>
 		<span class="n">hash_value</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">hash_input</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">binascii</span><span class="o">.</span><span class="n">unhexlify</span><span class="p">(</span><span class="n">hash_value</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-		<span class="sd">&quot;&quot;&quot;Returns header as bytes.&quot;&quot;&quot;</span>
+		<span class="sd">&quot;&quot;&quot;Returns header as bytes. A message id will be generated if value was not already set.&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>
 			<span class="s1">&#39;!BBBBHHI4s&#39;</span><span class="p">,</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
@@ -173,22 +193,23 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
 			<span class="n">utils</span><span class="o">.</span><span class="n">ip_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">),</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_message_id</span><span class="p">()</span>
 		<span class="p">)</span>
 
 	<span class="nd">@staticmethod</span>
 	<span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="n">header_bytes</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;Instantiates a new Header from bytes.&quot;&quot;&quot;</span>
 		<span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">msg_type_val</span><span class="p">,</span> <span class="n">ttl</span><span class="p">,</span> <span class="n">hop_count</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">ip_num</span><span class="p">,</span> <span class="n">message_id</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;!BBBBHHI4s&#39;</span><span class="p">,</span> <span class="n">header_bytes</span><span class="p">)</span>
-		<span class="n">header</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">(</span><span class="n">msg_type_val</span><span class="p">))</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="n">hop_count</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">num_to_ip</span><span class="p">(</span><span class="n">ip_num</span><span class="p">)</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="n">message_id</span>
-		<span class="k">return</span> <span class="n">header</span>
+		<span class="k">return</span> <span class="n">Header</span><span class="p">(</span>
+			<span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+			<span class="n">msg_type</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">(</span><span class="n">msg_type_val</span><span class="p">),</span>
+			<span class="n">ttl</span><span class="o">=</span><span class="n">ttl</span><span class="p">,</span>
+			<span class="n">hop_count</span><span class="o">=</span><span class="n">hop_count</span><span class="p">,</span>
+			<span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+			<span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span>
+			<span class="n">ip</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">num_to_ip</span><span class="p">(</span><span class="n">ip_num</span><span class="p">),</span>
+			<span class="n">message_id</span><span class="o">=</span><span class="n">message_id</span>
+		<span class="p">)</span>
 </pre></div>
 
         </details>
@@ -201,25 +222,56 @@
                                         <div class="attr function"><a class="headerlink" href="#Header.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Header</span><span class="signature">(msg_type: <a href="#types.MsgType">p2p_messenger.protocol.types.MsgType</a>, payload=&#39;&#39;)</span>
+            <span class="name">Header</span><span class="signature">(
+    version=1,
+    msg_type: <a href="#types.MsgType">p2p_messenger.protocol.types.MsgType</a> = None,
+    ttl=5,
+    hop_count=0,
+    port=1337,
+    length=0,
+    ip=&#39;10.1.1.2&#39;,
+    message_id=None
+)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_version</span>
+            <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+		<span class="bp">self</span><span class="p">,</span>
+		<span class="n">version</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_version</span><span class="p">,</span>
+		<span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+		<span class="n">ttl</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_default_ttl</span><span class="p">,</span>
+		<span class="n">hop_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+		<span class="n">port</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">default_port</span><span class="p">,</span>
+		<span class="n">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+		<span class="n">ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()),</span>
+		<span class="n">message_id</span> <span class="o">=</span> <span class="bp">None</span>
+	<span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">msg_type</span> <span class="o">=</span> <span class="n">msg_type</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">prot_default_ttl</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="mi">0</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="mi">1337</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_message_id</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="n">hop_count</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="n">message_id</span>
 </pre></div>
 
         </details>
 
     
+
+                            </div>
+                            <div id="Header.sequence_id" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Header.sequence_id">#&nbsp;&nbsp</a>
+
+        <span class="name">sequence_id</span><span class="default_value"> = 0</span>
+    </div>
+
+            <div class="docstring"><p>This value is part of the message id hash input and gets incremented continuously.
+This is crucial for when multiple messages of the same type get created at the same time.</p>
+</div>
+
 
                             </div>
                             <div id="Header.gen_message_id" class="classattr">
@@ -233,15 +285,16 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="nf">gen_message_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-		<span class="sd">&quot;&quot;&quot;Creates new message id for this header using current timestamp.&quot;&quot;&quot;</span>
-		<span class="n">hash_input</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+		<span class="sd">&quot;&quot;&quot;Creates a new unique message id for this header.&quot;&quot;&quot;</span>
+		<span class="n">hash_input</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">Header</span><span class="o">.</span><span class="n">sequence_id</span><span class="p">)</span>
+		<span class="n">Header</span><span class="o">.</span><span class="n">sequence_id</span> <span class="o">+=</span> <span class="mi">1</span>
 		<span class="n">hash_value</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">hash_input</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">binascii</span><span class="o">.</span><span class="n">unhexlify</span><span class="p">(</span><span class="n">hash_value</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Creates new message id for this header using current timestamp.</p>
+            <div class="docstring"><p>Creates a new unique message id for this header.</p>
 </div>
 
 
@@ -257,7 +310,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-		<span class="sd">&quot;&quot;&quot;Returns header as bytes.&quot;&quot;&quot;</span>
+		<span class="sd">&quot;&quot;&quot;Returns header as bytes. A message id will be generated if value was not already set.&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>
 			<span class="s1">&#39;!BBBBHHI4s&#39;</span><span class="p">,</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
@@ -267,13 +320,13 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
 			<span class="n">utils</span><span class="o">.</span><span class="n">ip_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">),</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_message_id</span><span class="p">()</span>
 		<span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Returns header as bytes.</p>
+            <div class="docstring"><p>Returns header as bytes. A message id will be generated if value was not already set.</p>
 </div>
 
 
@@ -293,15 +346,16 @@
 	<span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="n">header_bytes</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;Instantiates a new Header from bytes.&quot;&quot;&quot;</span>
 		<span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">msg_type_val</span><span class="p">,</span> <span class="n">ttl</span><span class="p">,</span> <span class="n">hop_count</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">ip_num</span><span class="p">,</span> <span class="n">message_id</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;!BBBBHHI4s&#39;</span><span class="p">,</span> <span class="n">header_bytes</span><span class="p">)</span>
-		<span class="n">header</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">(</span><span class="n">msg_type_val</span><span class="p">))</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">hop_count</span> <span class="o">=</span> <span class="n">hop_count</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">num_to_ip</span><span class="p">(</span><span class="n">ip_num</span><span class="p">)</span>
-		<span class="n">header</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="n">message_id</span>
-		<span class="k">return</span> <span class="n">header</span>
+		<span class="k">return</span> <span class="n">Header</span><span class="p">(</span>
+			<span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+			<span class="n">msg_type</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">(</span><span class="n">msg_type_val</span><span class="p">),</span>
+			<span class="n">ttl</span><span class="o">=</span><span class="n">ttl</span><span class="p">,</span>
+			<span class="n">hop_count</span><span class="o">=</span><span class="n">hop_count</span><span class="p">,</span>
+			<span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+			<span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span>
+			<span class="n">ip</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">num_to_ip</span><span class="p">(</span><span class="n">ip_num</span><span class="p">),</span>
+			<span class="n">message_id</span><span class="o">=</span><span class="n">message_id</span>
+		<span class="p">)</span>
 </pre></div>
 
         </details>
@@ -327,11 +381,11 @@
 	<span class="sd">&quot;&quot;&quot;Structure of a message including the protocol header and the payload.&quot;&quot;&quot;</span>
 
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">msg_type</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">msg_type</span><span class="o">=</span><span class="n">msg_type</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span>
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-		<span class="k">return</span> <span class="n">format</span><span class="p">(</span><span class="s1">&#39;Header: </span><span class="si">%s</span><span class="s1">, Payload: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">|&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 		<span class="sd">&quot;&quot;&quot;Returns message as bytes.&quot;&quot;&quot;</span>
@@ -354,7 +408,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_type</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">msg_type</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">msg_type</span><span class="o">=</span><span class="n">msg_type</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span>
 </pre></div>
 
@@ -451,7 +505,7 @@
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PongMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Convenience wrapper class for ping messages.&quot;&quot;&quot;</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">Pong</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">PONG</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -470,7 +524,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">Pong</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">PONG</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -501,8 +555,8 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PostMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Convenience wrapper class for ping messages.&quot;&quot;&quot;</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -515,13 +569,13 @@
                                         <div class="attr function"><a class="headerlink" href="#PostMessage.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">PostMessage</span><span class="signature">(message: str)</span>
+            <span class="name">PostMessage</span><span class="signature">(msg: str)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">MsgType</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 </pre></div>
 
         </details>
