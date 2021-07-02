@@ -40,6 +40,9 @@
                                 <a class="variable" href="#Config.default_port">default_port</a>
                         </li>
                         <li>
+                                <a class="variable" href="#Config.neighbours">neighbours</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Config.max_connections">max_connections</a>
                         </li>
                         <li>
@@ -47,6 +50,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#Config.prot_default_ttl">prot_default_ttl</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Config.bootstrap_peer">bootstrap_peer</a>
                         </li>
                         <li>
                                 <a class="function" href="#Config.load">load</a>
@@ -79,8 +85,10 @@
 <span class="sd">	Static class holding configuration values loaded from `config.yml`.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 
-	<span class="n">default_port</span> <span class="o">=</span> <span class="mi">3333</span>
+	<span class="n">default_port</span> <span class="o">=</span> <span class="mi">1337</span>
 	<span class="sd">&quot;&quot;&quot;Default port for the node to listen.&quot;&quot;&quot;</span>
+
+	<span class="n">neighbours</span> <span class="o">=</span> <span class="mi">5</span>
 
 	<span class="n">max_connections</span> <span class="o">=</span> <span class="mi">5</span>
 	<span class="sd">&quot;&quot;&quot;Maximum number of concurrent connections for a single node.&quot;&quot;&quot;</span>
@@ -91,15 +99,20 @@
 	<span class="n">prot_default_ttl</span> <span class="o">=</span> <span class="mi">5</span>
 	<span class="sd">&quot;&quot;&quot;TTL value used when creating messages.&quot;&quot;&quot;</span>
 
+	<span class="n">bootstrap_peer</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;Tuple of ip and port of a running node used for bootstrapping into the network.&quot;&quot;&quot;</span>
+
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;Load configuration values from `config.yml` and update values in class.&quot;&quot;&quot;</span>
 		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./config.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 			<span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">default_port</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;default_port&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">max_connections</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;max_connections&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_version</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_default_ttl</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;ttl&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">bootstrap_peer</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;ip&#39;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;port&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
@@ -121,8 +134,10 @@
 <span class="sd">	Static class holding configuration values loaded from `config.yml`.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 
-	<span class="n">default_port</span> <span class="o">=</span> <span class="mi">3333</span>
+	<span class="n">default_port</span> <span class="o">=</span> <span class="mi">1337</span>
 	<span class="sd">&quot;&quot;&quot;Default port for the node to listen.&quot;&quot;&quot;</span>
+
+	<span class="n">neighbours</span> <span class="o">=</span> <span class="mi">5</span>
 
 	<span class="n">max_connections</span> <span class="o">=</span> <span class="mi">5</span>
 	<span class="sd">&quot;&quot;&quot;Maximum number of concurrent connections for a single node.&quot;&quot;&quot;</span>
@@ -133,15 +148,20 @@
 	<span class="n">prot_default_ttl</span> <span class="o">=</span> <span class="mi">5</span>
 	<span class="sd">&quot;&quot;&quot;TTL value used when creating messages.&quot;&quot;&quot;</span>
 
+	<span class="n">bootstrap_peer</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;Tuple of ip and port of a running node used for bootstrapping into the network.&quot;&quot;&quot;</span>
+
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;Load configuration values from `config.yml` and update values in class.&quot;&quot;&quot;</span>
 		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./config.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 			<span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">default_port</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;default_port&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">max_connections</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;max_connections&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_version</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_default_ttl</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;ttl&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">bootstrap_peer</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;ip&#39;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;port&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
@@ -170,6 +190,15 @@
             <div class="docstring"><p>Default port for the node to listen.</p>
 </div>
 
+
+                            </div>
+                            <div id="Config.neighbours" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Config.neighbours">#&nbsp;&nbsp</a>
+
+        <span class="name">neighbours</span><span class="default_value"> = 5</span>
+    </div>
+
+    
 
                             </div>
                             <div id="Config.max_connections" class="classattr">
@@ -205,6 +234,17 @@
 
 
                             </div>
+                            <div id="Config.bootstrap_peer" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#Config.bootstrap_peer">#&nbsp;&nbsp</a>
+
+        <span class="name">bootstrap_peer</span><span class="default_value"> = (&#39;127.0.0.1&#39;, 1337)</span>
+    </div>
+
+            <div class="docstring"><p>Tuple of ip and port of a running node used for bootstrapping into the network.</p>
+</div>
+
+
+                            </div>
                             <div id="Config.load" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Config.load">#&nbsp;&nbsp</a>
 
@@ -222,9 +262,11 @@
 		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./config.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 			<span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">default_port</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;default_port&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">max_connections</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;max_connections&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_version</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">prot_default_ttl</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">][</span><span class="s1">&#39;ttl&#39;</span><span class="p">]</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">bootstrap_peer</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;ip&#39;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;bootstrap&#39;</span><span class="p">][</span><span class="s1">&#39;port&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
