@@ -1,5 +1,9 @@
 default_port: 1337
+neighbours: 5
 max_connections: 5
 protocol:
   version: 1
   ttl: 5
+bootstrap:
+  ip: 127.0.0.1
+  port: 1337

@@ -1,3 +1,4 @@
+from p2p_messenger import node
 import struct
 import time
 import hashlib
@@ -34,7 +35,7 @@ class Header:
 		msg_type: types.MsgType = None,
 		ttl = Config.prot_default_ttl,
 		hop_count = 0,
-		port = Config.default_port,
+		port = None,
 		length = 0,
 		ip = socket.gethostbyname(socket.gethostname()),
 		message_id = None
@@ -51,13 +52,13 @@ class Header:
 	def __repr__(self) -> str:
 		return '|{}|{}|{}|{}|{}|{}|{}|{}|'.format(
 			self.version,
-			str(self.msg_type)[len('MsgType.'):],
+			self.msg_type.name,
 			self.ttl,
 			self.hop_count,
 			self.port,
 			self.length,
 			self.ip,
-			binascii.hexlify(self.message_id).decode('utf-8')
+			binascii.hexlify(self.message_id).decode('utf-8') if self.message_id else ''
 		)
 
 	def gen_message_id(self) -> bytes:

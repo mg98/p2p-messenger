@@ -3,8 +3,9 @@ from . import types, header
 class Message:
 	"""Structure of a message including the protocol header and the payload."""
 
-	def __init__(self, msg_type: types.MsgType, payload=''):
-		self.header = header.Header(msg_type=msg_type, length=len(payload))
+	def __init__(self, msg_type: types.MsgType, sender: tuple[str, int], payload=''):
+		"""Initiate a new message."""
+		self.header = header.Header(msg_type=msg_type, ip=sender[0], port=sender[1], length=len(payload))
 		self.payload = payload
 
 	def __repr__(self) -> str:
@@ -14,20 +15,10 @@ class Message:
 		"""Returns message as bytes."""
 		return self.header.bytes() + bytes(self.payload.encode('utf-8'))
 
+	def get_id(self) -> str:
+		"""Returns message id from header."""
+		return self.header.message_id
 
-class PingMessage(Message):
-	"""Convenience wrapper class for ping messages."""
-	def __init__(self):
-		super().__init__(types.MsgType.PING)
-
-
-class PongMessage(Message):
-	"""Convenience wrapper class for ping messages."""
-	def __init__(self):
-		super().__init__(types.MsgType.PONG)
-
-
-class PostMessage(Message):
-	"""Convenience wrapper class for ping messages."""
-	def __init__(self, msg: str):
-		super().__init__(types.MsgType.POST, msg)
+	def get_sender(self) -> tuple[str, int]:
+		"""Returns sender (ip, port) tuple of this message."""
+		return (self.header.ip, self.header.port)

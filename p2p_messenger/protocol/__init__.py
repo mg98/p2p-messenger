@@ -1,10 +1,10 @@
+from p2p_messenger.config import Config
 from .header import Header
-from .message import Message, PingMessage, PongMessage, PostMessage
+from .message import *
 
 __all__ = [
 	'Header',
-	'Message',
-	'PingMessage',
-	'PongMessage',
-	'PostMessage'
+	'Message'
 ]
+
+Config.load()
