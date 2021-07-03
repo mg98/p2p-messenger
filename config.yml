@@ -4,6 +4,7 @@ max_connections: 5
 protocol:
   version: 1
   ttl: 5
+  max_ttl: 7
 bootstrap:
   ip: 127.0.0.1
   port: 1337

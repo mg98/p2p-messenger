@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
-
 from fire import Fire
-from . import node, client, Config
+import logging
+from datetime import datetime
+import sys
+from . import node, Config
 
 class CLI(object):
 	"""A simple P2P messenger."""
@@ -18,15 +19,20 @@ class CLI(object):
 
 		node.run(port, address)
 
-	def ping(self):
-		"""Pings local server."""
-		client.ping()
-
-	def post(self, msg: str):
-		"""Posts chat message."""
-		client.post(msg)
-
 
 if __name__ == '__main__':
 	Config.load()
+
+	log_filename = 'logs/' + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.log')
+	logging.basicConfig(
+		format='%(asctime)s [%(levelname)s] %(message)s',
+		datefmt='%Y-%m-%d %H:%M:%S',
+		encoding='utf-8',
+		level=logging.DEBUG,
+		handlers=[
+			#logging.FileHandler(log_filename),
+			logging.StreamHandler(stream=sys.stdout)
+		]
+	)
+
 	Fire(CLI)

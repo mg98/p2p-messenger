@@ -19,6 +19,9 @@ class Config:
 	prot_default_ttl = 5
 	"""TTL value used when creating messages."""
 
+	prot_max_ttl = 7
+	"""Maximum allowed TTL of messages."""
+
 	bootstrap_peer = ('127.0.0.1', 1337)
 	"""Tuple of ip and port of a running node used for bootstrapping into the network."""
 
@@ -32,4 +35,5 @@ class Config:
 			cls.max_connections = config['max_connections']
 			cls.prot_version = config['protocol']['version']
 			cls.prot_default_ttl = config['protocol']['ttl']
+			cls.prot_max_ttl = config['protocol']['max_ttl']
 			cls.bootstrap_peer = (config['bootstrap']['ip'], config['bootstrap']['port'])
