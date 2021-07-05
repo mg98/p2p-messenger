@@ -62,6 +62,7 @@ class Node:
 			logging.warn('Bootstrapping failed. Continuing as detached peer.')
 			return
 
+		logging.debug('Sending message of type PING to %s:%d' % addr)
 		s.send(Message(types.MsgType.PING, self.host_addr).bytes())
 
 		# wait for some pongs
@@ -111,7 +112,8 @@ class Node:
 		if msg.header.ttl > 0 and msg.header.hop_count <= Config.prot_max_ttl:
 			# forward ping to all neighbours
 			logging.debug('Forwarding ping to %d neighbours.' % len(self.neighbours))
-			for n in self.neighbours: n.send(msg)
+			for n in self.neighbours:
+				n.send(msg)
 			self.recv_pings[msg.get_id()] = msg.get_sender()
 
 		peer = Peer(msg.get_sender())
@@ -122,7 +124,8 @@ class Node:
 			logging.info('Connecting new neighbour: {}'.format(peer.addr))
 
 		# send pong to sender
-		peer.send(Message(types.MsgType.PONG, self.host_addr))
+		if len(self.neighbours) < Config.neighbours:
+			peer.send(Message(types.MsgType.PONG, self.host_addr))
 
 	def handle_pong(self, msg: Message):
 		"""Handles incoming pong."""
