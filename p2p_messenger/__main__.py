@@ -2,7 +2,8 @@ from fire import Fire
 import logging
 from datetime import datetime
 import sys
-from . import node, Config
+from . import Config
+from .node import Node
 
 class CLI(object):
 	"""A simple P2P messenger."""
@@ -17,7 +18,7 @@ class CLI(object):
 			else: address = tuple(b.split(':', maxsplit=1))
 		else: address = Config.bootstrap_peer
 
-		node.run(port, address)
+		Node(port).run(address)
 
 
 if __name__ == '__main__':
