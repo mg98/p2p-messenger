@@ -1,3 +1,4 @@
+import logging
 from p2p_messenger.protocol.message import Message
 import socket
 
@@ -16,8 +17,10 @@ class Peer:
 			self.socket.connect(self.addr)
 
 	def send(self, msg: Message):
+		logging.debug("Sending message of type %s to %s:%d" % (msg.header.msg_type.name, self.addr[0], self.addr[1]))
 		self.socket.send(msg.bytes())
 
 	def disconnect(self):
+		logging.debug("Disconnecting %s:%d" % self.addr)
 		self.socket.shutdown(socket.SHUT_RDWR)
 		self.socket.close()

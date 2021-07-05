@@ -32,7 +32,7 @@ class Node:
 		bt = Thread(target=self.bootstrap, args=[b_addr])
 		bt.start()
 
-		logging.info("Listening on port %d..." % self.host_addr[1])
+		logging.info('Listening on port %d...' % self.host_addr[1])
 
 		try:
 			while True:
@@ -45,13 +45,16 @@ class Node:
 			logging.info('Disconnecting from peers...')
 			for n in self.neighbours:
 				n.send(Message(types.MsgType.BYE, self.host_addr))
-				#n.shutdown(socket.SHUT_RDWR)
-				#n.close()
 
 	def bootstrap(self, addr: tuple[str, int]):
 		"""Joins the network by sending a ping message to the given address."""
 
-		logging.info("Attempting to bootstrap using %s:%s..." % addr)
+		logging.info('Attempting to bootstrap using %s:%s...' % addr)
+
+		if addr == self.host_addr:
+			logging.warn('Aborting bootstrap: Cannot bootstrap with yourself. Continuing as detached peer.')
+			return
+
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:
 			s.connect(addr)
@@ -61,6 +64,7 @@ class Node:
 
 		s.send(Message(types.MsgType.PING, self.host_addr).bytes())
 
+		# wait for some pongs
 		sleep(3)
 		logging.debug('Received neighbour candidates: {}'.format(self.neighbour_candidates))
 
@@ -106,6 +110,7 @@ class Node:
 
 		if msg.header.ttl > 0 and msg.header.hop_count <= Config.prot_max_ttl:
 			# forward ping to all neighbours
+			logging.debug('Forwarding ping to %d neighbours.' % len(self.neighbours))
 			for n in self.neighbours: n.send(msg)
 			self.recv_pings[msg.get_id()] = msg.get_sender()
 
@@ -138,9 +143,11 @@ class Node:
 			s.send(Message(types.MsgType.PONG, self.recv_pings[msg.get_id()]).bytes())
 
 	def handle_bye(self, msg: Message):
+		"""Handles incoming bye."""
+
 		for n in self.neighbours:
 			if n.addr == msg.get_sender():
-				n.disconnect()
 				self.neighbours.remove(n)
+				n.disconnect()
 				break
 
