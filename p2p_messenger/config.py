@@ -1,9 +1,13 @@
 import yaml
 
+
 class Config:
 	"""
 	Static class holding configuration values loaded from `config.yml`.
 	"""
+
+	default_ip_addr = '127.0.0.1'
+	"""Default IP address for the node."""
 
 	default_port = 1337
 	"""Default port for the node to listen."""
@@ -22,7 +26,7 @@ class Config:
 	prot_max_ttl = 7
 	"""Maximum allowed TTL of messages."""
 
-	bootstrap_peer = ('127.0.0.1', 1337)
+	bootstrap_peer = (default_ip_addr, default_port)
 	"""Tuple of ip and port of a running node used for bootstrapping into the network."""
 
 	@classmethod
@@ -30,6 +34,7 @@ class Config:
 		"""Load configuration values from `config.yml` and update values in class."""
 		with open('./config.yml', 'r') as f:
 			config = yaml.safe_load(f)
+			cls.default_ip = config['default_ip']
 			cls.default_port = config['default_port']
 			cls.neighbours = config['neighbours']
 			cls.max_connections = config['max_connections']

@@ -1,3 +1,3 @@
 from .config import Config
 
-#Config.load()
+# Config.load()
