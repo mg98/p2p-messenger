@@ -103,9 +103,9 @@ class Node:
 	def reply(self, client: socket):
 		"""Handles incoming requests."""
 
-		# TODO create a loop
-		header_bytes = client.recv(16)
-		try:
+		connected = True
+		while connected:
+			header_bytes = client.recv(16)
 			header = Header.from_bytes(header_bytes)
 
 			payload = client.recv(header.length)
@@ -122,9 +122,8 @@ class Node:
 				self.handle_pong(msg)
 			elif msg.header.msg_type == types.MsgType.BYE:
 				self.handle_bye(msg)
-		except struct.error:
-			logging.warning(f"Message does not conform with protocol specification. "
-							f"Content: <{header_bytes.decode('utf-8')}>")
+				connected = False
+		client.close()
 
 	def handle_ping(self, msg: Message):
 		"""Handles incoming ping."""
