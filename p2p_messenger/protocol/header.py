@@ -20,6 +20,8 @@ from ..config import Config
 # |                     Message ID                    |
 # +------------+------------+------------+------------+
 # =======================================================
+
+
 class Header:
 	"""Structure of the protocol header included in the first 16 bytes of every message."""
 
@@ -31,14 +33,14 @@ class Header:
 
 	def __init__(
 		self,
-		version = Config.prot_version,
+		version=Config.prot_version,
 		msg_type: types.MsgType = None,
-		ttl = Config.prot_default_ttl,
-		hop_count = 0,
-		port = None,
-		length = 0,
-		ip = socket.gethostbyname(socket.gethostname()),
-		message_id = None
+		ttl=Config.prot_default_ttl,
+		hop_count=0,
+		port=None,
+		length=0,
+		ip=socket.gethostbyname(socket.gethostname()),
+		message_id=None
 	):
 		self.version = version
 		self.msg_type = msg_type

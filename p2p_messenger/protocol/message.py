@@ -1,5 +1,6 @@
 from . import types, header
 
+
 class Message:
 	"""Structure of a message including the protocol header and the payload."""
 
@@ -21,4 +22,4 @@ class Message:
 
 	def get_sender(self) -> tuple[str, int]:
 		"""Returns sender (ip, port) tuple of this message."""
-		return (self.header.ip, self.header.port)
+		return self.header.ip, self.header.port
