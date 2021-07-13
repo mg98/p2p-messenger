@@ -105,9 +105,15 @@ class Node:
 
 		connected = True
 		while connected:
+			# TODO fix struct.error bug with zero bytes, occurs when
+			#  - peers (all except bootstrapping peer) shutdown via ctrl+c (from all neighbours)
+			#  - bootstrapping peer gets it from all the peers after some time
 			header_bytes = client.recv(16)
+			if len(header_bytes) == 0:
+				logging.warning(f'Received zero bytes message. Closing socket: {client}')
+				client.close()
+				return
 			header = Header.from_bytes(header_bytes)
-
 			payload = client.recv(header.length)
 			msg = Message(header.msg_type, self.host_addr)
 			msg.header = header
@@ -136,11 +142,13 @@ class Node:
 		msg.header.hop_count += 1
 
 		if msg.header.ttl > 0 and msg.header.hop_count <= Config.prot_max_ttl:
-			# forward ping to all neighbours
-			logging.debug('Forwarding ping to %d neighbours.' % len(self.neighbours))
+			# forward ping to all neighbours (except the neighbour that we got the ping from)
+			num_of_neighbours = len(self.neighbours)-1
+			logging.debug('Forwarding ping to %d neighbours.' % num_of_neighbours)
 			for n in self.neighbours:
 				# Do not send the ping back to where we got it from
 				if n.addr is not msg.get_sender():
+					logging.debug(f'Sender check passed: <{n.addr}> vs. <{msg.get_sender()}>')
 					logging.debug(f'Forwarding ping to {n}')
 					n.send(msg)
 			self.recv_pings[msg.get_id()] = msg.get_sender()

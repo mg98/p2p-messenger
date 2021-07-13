@@ -18,6 +18,7 @@ class Peer:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.connect(self.addr)
 			logging.debug(f"Established peer connection to address: {self.addr}")
+			logging.debug(f"Socket printout: {self.socket}")
 
 	def __repr__(self) -> str:
 		return format('Peer connection %s, socket printout %s' % (str(self.addr), self.socket))
