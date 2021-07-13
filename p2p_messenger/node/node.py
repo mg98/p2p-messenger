@@ -96,6 +96,7 @@ class Node:
 		for addr in neighbour_addrs:
 			logging.info('Connecting new neighbour (bootstrapping): {}'.format(addr))
 			self.neighbours.append(Peer(addr))
+		logging.debug(f'Current neighbours: {self.neighbours}')
 
 		self.neighbour_candidates = []
 		logging.debug(f'Finished bootstrapping process for node with {self.pub_key}')
@@ -141,20 +142,24 @@ class Node:
 		msg.header.ttl -= 1
 		msg.header.hop_count += 1
 
-		if msg.header.ttl > 0 and msg.header.hop_count <= Config.prot_max_ttl:
+		if msg.header.ttl > 0 and msg.header.hop_count <= Config.prot_max_ttl and self.neighbours:
 			# forward ping to all neighbours (except the neighbour that we got the ping from)
-			num_of_neighbours = len(self.neighbours)-1
-			logging.debug('Forwarding ping to %d neighbours.' % num_of_neighbours)
+			num_of_neighbours = len(self.neighbours)
+			logging.debug('Forwarding ping to at most %d neighbours.' % num_of_neighbours)
 			for n in self.neighbours:
 				# Do not send the ping back to where we got it from
 				if n.addr is not msg.get_sender():
-					logging.debug(f'Sender check passed: <{n.addr}> vs. <{msg.get_sender()}>')
+					logging.debug(f'Sender check passed: neighbour <{n.addr}> vs. sender <{msg.get_sender()}>')
 					logging.debug(f'Forwarding ping to {n}')
 					n.send(msg)
 			self.recv_pings[msg.get_id()] = msg.get_sender()
 
 		peer = Peer(msg.get_sender())
 
+		# TODO can we ensure that neighbour connection after ping is symmetrical?
+		#  what if this peer builds a neighbour connection to the other peer
+		#  but the peer does not choose this peer out of its neighbour candidates?
+		#  maybe we need a handshake after all
 		if len(self.neighbours) < Config.neighbours:
 			# append to neighbours
 			logging.info('Connecting to new neighbour after ping: {}'.format(peer.addr))
