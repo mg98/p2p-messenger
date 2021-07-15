@@ -35,7 +35,7 @@ if __name__ == '__main__':
 	log_filename = 'logs/' + datetime.now().strftime('%Y-%m-%d_%H:%M:%S.log')
 	# noinspection PyArgumentList
 	logging.basicConfig(
-		format='%(asctime)s [%(levelname)s] %(message)s',
+		format='%(asctime)s [%(levelname)s] %(message)s [%(threadName)s]',
 		datefmt='%Y-%m-%d %H:%M:%S',
 		encoding='utf-8',
 		level=logging.DEBUG,
