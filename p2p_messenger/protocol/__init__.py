@@ -1,4 +1,4 @@
-from p2p_messenger.config import Config
+from ..config import Config
 from .header import Header
 from .message import *
 

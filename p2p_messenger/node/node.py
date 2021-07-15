@@ -11,9 +11,11 @@ from ..config import Config
 from ..protocol import Header, Message, types, utils
 
 
-class Node:
-	def __init__(self, port: int):
+class Node(Thread):
+	def __init__(self, port: int, b_addr: tuple[str, int]):
 		"""Initiates a new node (have to call `run` to activate the node)."""
+
+		Thread.__init__(self)
 
 		self.ip = socket.gethostbyname(socket.gethostname())
 		"""IP of this node"""
@@ -54,37 +56,41 @@ class Node:
 		self.recipient_id_map: dict[str, Optional[tuple[str, int]]] = {}
 		"""Dictionary mapping peer ids to the address tuple of the recipient"""
 
-	def run(self, b_addr: tuple[str, int]):
+		self.b_addr = b_addr
+
+	def run(self):
 		"""Runs a node listening for connections."""
 
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		s.bind((socket.gethostname(), self.port))
-		s.listen(Config.max_connections)
+		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.s.bind((socket.gethostname(), self.port))
+		self.s.listen(Config.max_connections)
 
-		bt = Thread(target=self.bootstrap, args=[b_addr])
+		bt = Thread(target=self.bootstrap, args=[self.b_addr])
 		bt.start()
 
 		logging.info(f'Node with <{self.peer_id}> reachable at {self.ip} on port {self.port}...')
 
 		try:
 			while True:
-				(client, addr) = s.accept()
+				(client, addr) = self.s.accept()
 				logging.debug(f'Accept connection from {addr}, socket {client}')
 				ct = Thread(target=self.reply, args=[client])
 				ct.start()
-
 		except KeyboardInterrupt:
-			# teardown connections to neighbours
-			logging.info('Disconnecting from peers...')
-			for n in self.outbound_neighbours:
-				logging.debug(f'Disconnect from neighbour: {n}')
-				n.send(Message(types.MsgType.BYE, self.host_addr))  # signal neighbor to close its connection
-				n.disconnect()  # close own outgoing connection to neighbour
-			# wait for other peers to handle bye message
-			sleep(1)
-			s.shutdown(socket.SHUT_RDWR)
-			s.close()
+			self.shutdown()
+
+	def shutdown(self):
+		# teardown connections to neighbours
+		logging.info('Disconnecting from peers...')
+		for n in self.outbound_neighbours:
+			logging.debug(f'Disconnect from neighbour: {n}')
+			n.send(Message(types.MsgType.BYE, self.host_addr))  # signal neighbor to close its connection
+			n.disconnect()  # close own outgoing connection to neighbour
+		# wait for other peers to handle bye message
+		sleep(1)
+		self.s.shutdown(socket.SHUT_RDWR)
+		self.s.close()
 
 	def bootstrap(self, addr: tuple[str, int]):
 		"""Joins the network by sending a ping message to the given address."""
@@ -101,7 +107,6 @@ class Node:
 			s.connect(addr)
 		except ConnectionRefusedError:
 			logging.warning('Bootstrapping failed. Continuing as detached peer.')
-
 			return
 
 		logging.debug('Sending message of type PING to %s:%d' % addr)
@@ -129,7 +134,8 @@ class Node:
 
 		# TODO Send a test message to bootstrapping peer? But we need the peer id somehow
 
-	def join(self, addr):
+	# Function must not be called "join" because it'd overwrite the `join` fn of mother class `Thread`!
+	def peer_join(self, addr):
 		"""Initiates the process of building a neighbour relation with a peer."""
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect(addr)

@@ -1,3 +1,4 @@
+import os
 from fire import Fire
 import logging
 from datetime import datetime
@@ -26,7 +27,46 @@ class CLI(object):
 		else:
 			address = Config.bootstrap_peer
 		logging.debug('Address: %s', address)
-		Node(port).run(address)
+
+
+		node = Node(port, address)
+		node.start()
+
+		try:
+			while True:
+				cmd = input('Command: ')
+				cmd_parts = cmd.split(' ')
+				if len(cmd_parts) == 0:
+					print('Invalid command.')
+					continue
+
+				if cmd_parts[0] == 'neighbours':
+					print('Inbound neighbours: ', node.inbound_neighbours)
+					print('Outbound neighbours: ', node.outbound_neighbours)
+				elif cmd_parts[0] == 'post':
+					if len(cmd_parts) < 3:
+						print('Invalid command. Usage: post <peer-id> <message>')
+						continue
+					peer_id = cmd_parts[1]
+					payload = ' '.join(cmd_parts[2:])
+
+					# TODO: Find socket with according peer id (QUERY) and send message.
+					# TODO: Encrypt payload with "peer_id" (derive public key of it).
+					# (Optional) Sign message and implement verification etc. on the recipient side.
+
+					# Tip: Implement this logic inside the node module and only call the functions. Otherwise you risk circular imports!!
+					# Message(types.MsgType.POST, node.host_addr, payload=payload)
+
+					# TODO: Get recipient socket and submit message.
+				else:
+					print('Unknown command.')
+		except:
+			try:
+				node.shutdown()
+			except Exception as e:
+				logging.error(e)
+			finally:
+				os._exit(1)
 
 
 if __name__ == '__main__':
