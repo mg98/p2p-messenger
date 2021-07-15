@@ -1,14 +1,18 @@
 import logging
 from p2p_messenger.protocol.message import Message
 import socket
+from ..protocol import utils
 
 
 class Peer:
 	def __init__(
 		self,
 		addr: tuple[str, int],
+		peer_id: str = None,
 		s: socket.socket = None
 	):
+		self.peer_id = peer_id
+		self.pub_key = utils.peer_id_to_pub_key(self.peer_id) if peer_id else None
 		self.addr = addr
 
 		if s:
@@ -17,8 +21,11 @@ class Peer:
 			# establish socket connection from node to a peer
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.connect(self.addr)
-			logging.debug(f"Established peer connection to address: {self.addr}")
+			logging.debug(f"Established peer connection to node {self.peer_id} with address: {self.addr}")
 			logging.debug(f"Socket printout: {self.socket}")
+
+		self.sock_name = self.socket.getsockname()
+		self.peer_name = self.socket.getpeername()
 
 	def __repr__(self) -> str:
 		return format('Peer connection %s, socket printout %s' % (str(self.addr), self.socket))
