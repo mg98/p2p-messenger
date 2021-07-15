@@ -1,7 +1,7 @@
 default_ip: 127.0.0.1
 default_port: 1337
 neighbours: 5
-max_connections: 5
+max_connections: 10
 protocol:
   version: 1
   ttl: 5
