@@ -4,9 +4,9 @@ from . import types, header
 class Message:
 	"""Structure of a message including the protocol header and the payload."""
 
-	def __init__(self, msg_type: types.MsgType, sender: tuple[str, int], payload=''):
+	def __init__(self, msg_type: types.MsgType, sender: tuple[str, int], msg_id=None, payload=''):
 		"""Initiate a new message."""
-		self.header = header.Header(msg_type=msg_type, ip=sender[0], port=sender[1], length=len(payload))
+		self.header = header.Header(msg_type=msg_type, ip=sender[0], port=sender[1], length=len(payload), message_id=msg_id)
 		self.payload = payload
 
 	def __repr__(self) -> str:
