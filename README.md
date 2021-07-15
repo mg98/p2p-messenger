@@ -14,9 +14,17 @@ The goal of this project was to create a decentralized application where users w
 
 ## Getting Started
 
-1. Install dependencies using `pip3 install -r requirements.txt`.
-2. Run a node using `python3 -m p2p_messenger node`.
-3. In a separate terminal, you can ping your node using `python3 -m p2p_messenger ping` or send a message using `python3 -m p2p_messenger post --msg='Hello node'`.
+1. Create and activate a virtual environment, e.g. 
+   ```bash
+   conda create --name p2p-messenger python=3.9
+   conda activate p2p-messenger
+   ```
+2. Install dependencies using `pip3 install -r requirements.txt`.
+3. Run a node using `python -m p2p_messenger node -port=1337`. This node will be used as the bootstrapping peer.
+4. In a second, separate terminal run a second node using `python -m p2p_messenger node -b="127.0.1.1:1337" -port=1338`. You may want to change the bootstrapping peer ip address in `-b` as it is dependent on your host machine.
+5. In the first terminal find the `[INFO] Node with peer ID <peer_id>` log message and copy the peer ID.
+6. In the second terminal, you can send a message from the second node to the first node using `python -m p2p_messenger post <peer_id> Hello node`. Replace the `<peer_id>` in the command accordingly.
+7. In the first terminal you should see a `[INFO] Message content: <Hello node>` log message.
 
 ## Technical Specification
 

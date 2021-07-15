@@ -73,7 +73,7 @@ class Node(Thread):
         bt = Thread(target=self.bootstrap, args=[self.b_addr])
         bt.start()
 
-        logging.info(f'Node with <{self.peer_id}> reachable at {self.ip} on port {self.port}...')
+        logging.info(f'Node with peer ID <{self.peer_id}> reachable at {self.ip} on port {self.port}...')
 
         try:
             while True:
@@ -171,13 +171,22 @@ class Node(Thread):
 
         def send_msg():
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(self.recipient_id_map[peer_id])
-            # TODO encrypt chat message
-            payload = peer_id + chat_msg
-            post_msg = Message(types.MsgType.POST, self.host_addr, payload=payload)
-            logging.debug(f'Sending message of type POST to {self.recipient_id_map[peer_id]}')
-            logging.debug(f'Message printout: {post_msg}')
-            s.send(post_msg.bytes())
+            try:
+                s.connect(self.recipient_id_map[peer_id])
+                # TODO encrypt chat message
+                payload = peer_id + chat_msg
+                post_msg = Message(types.MsgType.POST, self.host_addr, payload=payload)
+                logging.debug(f'Sending message of type POST to {self.recipient_id_map[peer_id]}')
+                logging.debug(f'Message printout: {post_msg}')
+                s.send(post_msg.bytes())
+            except Exception as e:
+                logging.error(f"{e}: Recipient not reachable via {self.recipient_id_map[peer_id]}")
+                self.recipient_id_map[peer_id] = None  # reset address mapping
+                try:
+                    s.shutdown(socket.SHUT_RDWR)
+                    s.close()
+                except OSError as e:
+                    logging.warning(e)
 
         if peer_id not in self.recipient_id_map or not self.recipient_id_map[peer_id]:
             self.recipient_id_map[peer_id] = None
