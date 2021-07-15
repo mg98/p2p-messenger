@@ -13,9 +13,9 @@ class Config:
 	"""Default port for the node to listen."""
 
 	neighbours = 5
-	"""Maximum number of neighbours for a single node."""
+	"""Minimum number of neighbours for a single node."""
 
-	max_connections = 5
+	max_connections = 10
 	"""Maximum number of concurrent connections for a single node."""
 
 	prot_version = 1
