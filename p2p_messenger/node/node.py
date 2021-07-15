@@ -65,7 +65,7 @@ class Node:
 		bt = Thread(target=self.bootstrap, args=[b_addr])
 		bt.start()
 
-		logging.info(f'Node with {self.pub_key} reachable at {self.ip} on port {self.port}...')
+		logging.info(f'Node with <{self.peer_id}> reachable at {self.ip} on port {self.port}...')
 
 		try:
 			while True:
