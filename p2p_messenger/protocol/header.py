@@ -49,7 +49,7 @@ class Header:
 		self.port = port
 		self.length = length
 		self.ip = ip
-		self.message_id = message_id
+		self.message_id = message_id if message_id else self.gen_message_id()
 
 	def __repr__(self) -> str:
 		return '|{}|{}|{}|{}|{}|{}|{}|{}|'.format(
@@ -81,7 +81,7 @@ class Header:
 			self.port,
 			self.length,
 			utils.ip_to_num(self.ip),
-			self.message_id if self.message_id else self.gen_message_id()
+			self.message_id
 		)
 
 	@staticmethod
