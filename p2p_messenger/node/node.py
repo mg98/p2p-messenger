@@ -231,9 +231,6 @@ class Node:
 
 	def handle_ping(self, msg: Message):
 		"""Handles incoming ping."""
-		# TODO this just saves the original sender of the ping instead of the neighbour that we got the msg from
-		self.recv_pings[msg.get_id()] = msg.get_sender()
-
 		if msg.get_id() in self.recv_pings:
 			logging.debug('Rejecting ping because message was already received.')
 			return
@@ -241,6 +238,8 @@ class Node:
 			logging.debug('Rejecting ping because we are the original sender of the message.')
 			return
 
+		# TODO this just saves the original sender of the ping instead of the neighbour that we got the msg from
+		self.recv_pings[msg.get_id()] = msg.get_sender()
 		msg.header.ttl -= 1
 		msg.header.hop_count += 1
 
@@ -370,15 +369,14 @@ class Node:
 
 	def handle_query(self, msg: Message):
 		"""Handles incoming query."""
-		# TODO this just saves the original sender of the query instead of the neighbour that we got the msg from
-		self.recv_queries[msg.get_id()] = msg.get_sender()
-
 		if msg.get_id() in self.recv_queries:
 			logging.debug('Rejecting query because message was already received.')
 			return
 		elif msg.get_sender() == self.host_addr:
 			logging.debug('Rejecting query because we are the original sender of the message.')
 			return
+		# TODO this just saves the original sender of the query instead of the neighbour that we got the msg from
+		self.recv_queries[msg.get_id()] = msg.get_sender()
 
 		# Compare recipient public key with own public key, if no match forward to neighbours
 		recipient_pub_key = utils.peer_id_to_pub_key(msg.payload)
