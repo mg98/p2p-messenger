@@ -28,7 +28,6 @@ class CLI(object):
 			address = Config.bootstrap_peer
 		logging.debug('Address: %s', address)
 
-
 		node = Node(port, address)
 		node.start()
 
@@ -47,26 +46,27 @@ class CLI(object):
 					if len(cmd_parts) < 3:
 						print('Invalid command. Usage: post <peer-id> <message>')
 						continue
-					peer_id = cmd_parts[1]
+					peer_id = clean_peer_id(cmd_parts[1])
 					payload = ' '.join(cmd_parts[2:])
 
-					# TODO: Find socket with according peer id (QUERY) and send message.
 					# TODO: Encrypt payload with "peer_id" (derive public key of it).
-					# (Optional) Sign message and implement verification etc. on the recipient side.
-
-					# Tip: Implement this logic inside the node module and only call the functions. Otherwise you risk circular imports!!
-					# Message(types.MsgType.POST, node.host_addr, payload=payload)
-
-					# TODO: Get recipient socket and submit message.
+					node.post_msg(chat_msg=payload, peer_id=peer_id)
 				else:
 					print('Unknown command.')
-		except:
+		except Exception as e:
+			logging.exception(e)
 			try:
 				node.shutdown()
 			except Exception as e:
-				logging.error(e)
+				logging.exception(e)
 			finally:
 				os._exit(1)
+
+
+def clean_peer_id(peer_id):
+	"""Removes quotes from peer id"""
+	peer_id = peer_id.replace('"', '').replace("'", "")
+	return peer_id
 
 
 if __name__ == '__main__':
