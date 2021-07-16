@@ -46,8 +46,8 @@ class CLI(object):
 					if len(cmd_parts) < 3:
 						print('Invalid command. Usage: post <peer-id> <message>')
 						continue
-					peer_id = clean_peer_id(cmd_parts[1])
-					payload = ' '.join(cmd_parts[2:])
+					peer_id = cmd_parts[1]
+					payload = 'hallo'
 
 					# TODO: Encrypt payload with "peer_id" (derive public key of it).
 					node.post_msg(chat_msg=payload, peer_id=peer_id)

@@ -2,7 +2,10 @@ import logging
 import struct
 import socket
 import rsa
+import base64
 
+RSA_PREFIX = base64.standard_b64encode(b'-----BEGIN RSA PUBLIC KEY-----').decode("utf-8")
+RSA_SUFFIX = base64.standard_b64encode(b'-----END RSA PUBLIC KEY-----').decode("utf-8")
 
 def ip_to_num(ip):
 	"""Convert IP address of sender as single number IP address of sender as single number."""
@@ -14,29 +17,27 @@ def num_to_ip(num) -> str:
 	return socket.inet_ntoa(struct.pack('>L', num))
 
 
-def pub_key_to_peer_id(pub_key: rsa.PublicKey, padding_char: str = "#") -> str:
-	"""Formats public key as peer id string with 32 characters"""
-	n = str(pub_key.n)
-	e = str(pub_key.e)
-	if len(n) > 16 or len(e) > 16:
-		logging.error(f'Public key does not fit into 32 characters: n <{n}>, e <{e}>')
-	else:
-		padding = padding_char * (16 - len(n))
-		n += padding
-		assert len(n) <= 16
-		padding = padding_char * (16 - len(e))
-		e += padding
-		assert len(e) <= 16
-	return n+e
+def pub_key_to_peer_id(pub_key: rsa.PublicKey) -> str:
+	"""Formats public key as peer id string."""
+
+	pem = pub_key._save_pkcs1_pem()
+	peer_id_bytes = base64.standard_b64encode(pem)
+	peer_id = peer_id_bytes.decode('utf-8')
+	print('Complete rsa: ', peer_id)
+	return peer_id[len(RSA_PREFIX):-len(RSA_SUFFIX)]
 
 
 def peer_id_to_pub_key(peer_id: str) -> rsa.PublicKey:
-	"""Convert peer id string to public key"""
+	"""Convert peer id string to public key."""
+
 	logging.debug(f"Converting peer id string <{peer_id}> (length: {len(peer_id)}) to public key")
-	assert len(peer_id) >= 32
-	n = int(remove_padding(peer_id[:16]))
-	e = int(remove_padding(peer_id[16:32]))
-	return rsa.PublicKey(n, e)
+
+	peer_id = RSA_PREFIX + peer_id + RSA_SUFFIX
+	peer_id_bytes = peer_id.encode('utf-8')
+	pem = base64.standard_b64decode(peer_id_bytes)
+	pub_key = rsa.PublicKey.load_pkcs1(pem)
+
+	return pub_key
 
 
 def remove_padding(padded_string: str, padding_char: str = "#") -> str:

@@ -459,10 +459,10 @@ class Node(Thread):
 
     def handle_post(self, msg: Message):
         """Handles incoming post."""
-        peer_id = msg.payload[:32]
+        peer_id = msg.payload[:24]
         if peer_id != self.peer_id:
             logging.error(f"Peer ID mismatch: recipient <{peer_id}> vs. own <{self.peer_id}>")
             return
-        msg_content = msg.payload[32:]
+        msg_content = msg.payload[24:]
         # TODO Decrypt message, fails if there are not enough bytes
         logging.info(f"Message content: <{msg_content}>")
