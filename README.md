@@ -3,6 +3,7 @@
 [![PDoc](http://img.shields.io/badge/pdoc-reference-blue.svg)](https://mg98.github.io/p2p-messenger/)
 [![License](https://img.shields.io/github/license/mg98/p2p-messenger)](./LICENSE)
 
+[https://github.com/mg98/p2p-messenger](https://github.com/mg98/p2p-messenger)
 ## About
 
 This project came about as a group assignment for the lecture **"Peer-to-Peer Systems"** at the Humboldt University of Berlin.
